@@ -1,0 +1,159 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<style>
+    .field {
+        width:800px;
+        height:800px;
+        border: 1px solid black;
+        position: relative;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .start {
+        border: 1px solid black;
+        width: 100px;
+        padding: 20px;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 370px;
+        cursor: pointer;
+    }
+
+    .time {
+        width: 100%;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 200px;
+        font-size: 100;
+        float: left;
+    }
+
+    .zone {
+        border: 2px solid black;
+        width: 100px;
+        height: 100px;
+        border-radius: 50px;
+        position: absolute;
+        text-align: center;
+        line-height: 1.7;
+        font-size: 60px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .active {
+        background-color: lightgreen;
+    }
+
+    .clicked {
+        background-color: red;
+    }
+</style>
+
+<script>
+    let remainingRounds = 5;
+    let remainingTargets = 0;
+
+    let start;
+
+    const activeClicked = function(e) {
+        if($(e.target).hasClass('clicked')) {
+            return;
+        }
+        $(e.target).addClass('clicked');
+        $(e.target).removeClass('active');
+        remainingTargets--;
+        $('.zone'+(6 - remainingTargets)).addClass('active');
+        $('.active').mousedown(activeClicked);
+        
+        if(remainingTargets == 0) {
+            remainingRounds--;
+            if(remainingRounds > 0) {
+                setup();
+            } else {
+                $('.field').empty();
+                $('.field').append('<div class="time">' + (new Date().getTime() - start)/1000 + '</div>');
+                setTimeout(function(){
+                    $('.field').append("<div class='start'>START</div>");
+                    $('.start').click(function() {
+                        setup();
+                        remainingRounds = 5;
+                        start = Date.now();
+                    });
+                }, 1000)
+            }
+        }
+    }
+
+    const setup = function() {
+        $('.field').empty();
+        var ax = [];
+        var ay = [];
+        for(var i=0;i<5;i++) {
+            var x = Math.random()*700;
+            var y = Math.random()*700;
+
+            for(var j=0;j<ax.length;j++) {
+                if((x-ax[j])*(x-ax[j]) + (y-ay[j])*(y-ay[j]) < 100*100) {
+                    x = Math.random()*700;
+                    y = Math.random()*700;
+                    j = -1;
+                }
+            }
+
+            ax.push(x);
+            ay.push(y);
+
+            $('.field').append("<div class='zone zone" + (i+1) + "' style='left:" + x + ";top:" + y + "'>" + (i+1) + "</div>");
+            $('.zone1').addClass('active');
+        }
+
+        /*
+        $('.zone').mouseover(function(e) {
+            if($(e.target).hasClass('clicked')) {
+                return;
+            }
+            $(e.target).addClass('clicked');
+            remainingTargets--;
+            
+            if(remainingTargets == 0) {
+                remainingRounds--;
+                if(remainingRounds > 0) {
+                    setup();
+                } else {
+                    $('.field').empty();
+                    $('.field').append('<div class="time">' + (new Date().getTime() - start)/1000 + '</div>');
+                }
+            }
+        });
+        */
+
+        
+
+        $('.active').mousedown(activeClicked);
+
+        remainingTargets = 5;
+    }
+
+    $( document ).ready(function() {
+        $('.start').click(function() {
+            setup();
+            start = Date.now();
+        });
+    });
+</script>
+</head>
+<body>
+
+<div class='field'>
+    <div class='start'>START</div>
+</div>
+
+
+</body>
+</html>
